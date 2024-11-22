@@ -4,6 +4,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import us.cloud.teachme.auth_service.model.User;
 
-public interface UserRepository extends MongoRepository<User, Integer>{
+public interface UserRepository extends MongoRepository<User, String>{
   
 }
