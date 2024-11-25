@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
 
@@ -22,19 +23,27 @@ public class UserService {
   }
 
   public User findUserById(String id){
-    return userRepository.findById(id).orElseThrow();
+    return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+  }
+
+  public User findUserByUsername(String username) {
+    return userRepository.findByUsername(username).stream().findFirst().orElseThrow(UserNotFoundException::new);
   }
 
   public User saveUser(User user) {
     if(user.getId() == null) {
+      // Creation of new user
       user.setPassword(passwordEncoder.encode(user.getPassword()));
+      user.setRole("USER");
     } else {
+      // Update of new user
       user.setPassword(findUserById(user.getId()).getPassword());
     }
     return userRepository.save(user);
   }
 
   public void deleteUser(String id) {
+    findUserById(id);
     userRepository.deleteById(id);
   }
   

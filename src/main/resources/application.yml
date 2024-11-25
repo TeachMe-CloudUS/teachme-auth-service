@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: Auth Service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+server:
+  port: 8081
