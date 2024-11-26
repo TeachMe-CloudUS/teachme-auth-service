@@ -1,0 +1,81 @@
+# Used for manual testing of the REST API.
+# You can run the requests in this file by 
+# using the REST Client extension for vscode
+
+@baseurl = http://localhost:8081/api/v1
+@content-type = application/json
+
+@userId = {{me.response.body.id}}
+@username = Prueba
+@password = 123456
+@token = {{signin.response.body.token}}
+
+###
+
+# @name me
+GET {{baseurl}}/auth/me HTTP/1.1
+Authorization: Bearer {{token}}
+
+###
+
+# @name signin
+
+POST {{baseurl}}/auth/signin HTTP/1.1
+Content-Type: {{content-type}}
+
+{
+    "username": "Prueba",
+    "password": "123456"
+}
+
+
+###
+
+# @name register
+POST {{baseurl}}/auth/register HTTP/1.1
+Content-Type: {{content-type}}
+
+{
+    "username": "Prueba",
+    "password": "123456"
+}
+
+###
+
+# @name validate
+GET {{baseurl}}/auth/validate HTTP/1.1
+Content-Type: {{content-type}}
+Authentication: Bearer {{token}}
+
+
+###
+
+# @name listAllUsers
+GET {{baseurl}}/user HTTP/1.1
+Authorization: Bearer {{token}}
+
+###
+
+# @name createUser
+
+POST {{baseurl}}/user HTTP/1.1
+Content-Type: {{content-type}}
+
+{
+    "username": "Prueba",
+    "password": "123456"
+}
+
+###
+
+# @name getUser
+
+GET {{baseurl}}/user/{{userId}} HTTP/1.1
+Authorization: Bearer {{token}}
+
+###
+
+# @name deleteUser
+
+DELETE {{baseurl}}/user/{{userId}} HTTP/1.1
+Authorization: Bearer {{token}}
