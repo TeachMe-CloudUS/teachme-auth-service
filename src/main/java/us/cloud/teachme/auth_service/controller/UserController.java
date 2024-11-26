@@ -1,6 +1,7 @@
 package us.cloud.teachme.auth_service.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -50,13 +51,13 @@ public class UserController {
     if(errors.hasErrors()) {
       return ResponseEntity.badRequest().body(errors.getAllErrors());
     }
-    return ResponseEntity.ok(userService.saveUser(user).getId());
+    return ResponseEntity.ok(Map.of("userId", userService.createUser(user).getId()));
   }
 
   @DeleteMapping("/{userId}")
   public ResponseEntity<Void> deleteUser(@PathVariable String userId){
     User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    if(!loggedUser.getRole().equals("ADMIN") || !loggedUser.getId().equals(userId)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    if(!loggedUser.getRole().equals("ADMIN") && !loggedUser.getId().equals(userId)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     userService.deleteUser(userId);
     return ResponseEntity.ok().build();
   }

@@ -3,26 +3,30 @@ package us.cloud.teachme.auth_service.controller;
 import java.security.SignatureException;
 import java.util.Map;
 
-import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
+import io.jsonwebtoken.JwtException;
+import us.cloud.teachme.auth_service.exceptions.UserAlreadyExistsException;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
 
 @ControllerAdvice
 public class AdviceController {
 
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
   @ExceptionHandler(UserNotFoundException.class)
-  public Map<String, String> handleNotFoundException(UserNotFoundException ex) {
-    return Map.of("error", ex.getMessage());
+  public ResponseEntity<?> handleNotFoundException(UserNotFoundException ex) {
+    return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
   }
 
-  @ResponseStatus(HttpStatus.OK)
-  @ExceptionHandler(SignatureException.class)
-  public String handleJwtException(SignatureException ex) {
-    return "Invalid token";
+  @ExceptionHandler(UserAlreadyExistsException.class)
+  public ResponseEntity<?> handleAlreadyExistsException(UserAlreadyExistsException ex) {
+    return ResponseEntity.badRequest().body(Map.of("error", ex.getMessage()));
+  }
+
+  @ExceptionHandler({ SignatureException.class, JwtException.class})
+  public ResponseEntity<?> handleJwtException() {
+    return ResponseEntity.badRequest().body(Map.of("error", "Invalid token"));
   }
   
 }

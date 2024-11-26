@@ -6,6 +6,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.AllArgsConstructor;
+import us.cloud.teachme.auth_service.exceptions.UserAlreadyExistsException;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
@@ -30,15 +31,12 @@ public class UserService {
     return userRepository.findByUsername(username).stream().findFirst().orElseThrow(UserNotFoundException::new);
   }
 
-  public User saveUser(User user) {
-    if(user.getId() == null) {
-      // Creation of new user
-      user.setPassword(passwordEncoder.encode(user.getPassword()));
-      user.setRole("USER");
-    } else {
-      // Update of new user
-      user.setPassword(findUserById(user.getId()).getPassword());
+  public User createUser(User user) {
+    if(!userRepository.findByUsername(user.getUsername()).isEmpty()) {
+      throw new UserAlreadyExistsException();
     }
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    user.setRole("USER");
     return userRepository.save(user);
   }
 

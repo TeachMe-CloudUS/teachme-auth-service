@@ -32,7 +32,7 @@ public class AuthController {
     if(!passwordEncoder.matches(userDto.password(), user.getPassword())) {
       return ResponseEntity.badRequest().body(Map.of("error", "Invalid username or password"));
     }
-    return ResponseEntity.ok(jwtService.generateToken(user.getId()));
+    return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getId())));
   }
 
   @PostMapping("/register")
