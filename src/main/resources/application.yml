@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: Auth Service
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
