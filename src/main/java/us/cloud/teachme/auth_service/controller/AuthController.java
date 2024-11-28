@@ -3,7 +3,7 @@ package us.cloud.teachme.auth_service.controller;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,8 +46,8 @@ public class AuthController {
   }
 
   @GetMapping("/me")
-  public ResponseEntity<Object> me() {
-    return ResponseEntity.ok(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+  public ResponseEntity<Object> me(@AuthenticationPrincipal User user) {
+    return ResponseEntity.ok(user);
   }
 
 }

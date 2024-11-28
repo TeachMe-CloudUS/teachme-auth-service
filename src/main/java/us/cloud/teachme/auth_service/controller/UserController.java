@@ -5,7 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,9 +32,8 @@ public class UserController {
   private final UserValidator userValidator;
 
   @GetMapping
-  public ResponseEntity<List<User>> findAllUsers() {
-    User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    if(!loggedUser.getRole().equals("ADMIN")) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+  public ResponseEntity<List<User>> findAllUsers(@AuthenticationPrincipal User user) {
+    if(user == null || !user.getRole().equals("ADMIN")) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     return ResponseEntity.ok(userService.findAllUsers());
   }
 
@@ -55,9 +54,8 @@ public class UserController {
   }
 
   @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> deleteUser(@PathVariable String userId){
-    User loggedUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-    if(!loggedUser.getRole().equals("ADMIN") && !loggedUser.getId().equals(userId)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+  public ResponseEntity<Void> deleteUser(@PathVariable String userId, @AuthenticationPrincipal User user) {
+    if(user == null || (user.getRole().equals("ADMIN") && !user.getId().equals(userId))) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     userService.deleteUser(userId);
     return ResponseEntity.ok().build();
   }
