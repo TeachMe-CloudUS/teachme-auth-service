@@ -11,6 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.model.UserDto;
@@ -20,6 +25,7 @@ import us.cloud.teachme.auth_service.service.UserService;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/api/v1/auth")
+@Tag(name = "Authentication", description = "API for authentication in teachme")
 public class AuthController {
 
   private final UserService userService;
@@ -27,6 +33,11 @@ public class AuthController {
   private final PasswordEncoder passwordEncoder;
 
   @PostMapping("/signin")
+  @Operation(summary = "Sign in", description = "Sign in to teachme platform")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "Sign in successful"),
+    @ApiResponse(responseCode = "400", description = "Invalid username or password")
+  })
   public ResponseEntity<?> signin(@RequestBody UserDto userDto) {
     User user = userService.findUserByUsername(userDto.username());
     if(!passwordEncoder.matches(userDto.password(), user.getPassword())) {
@@ -36,16 +47,33 @@ public class AuthController {
   }
 
   @PostMapping("/register")
+  @Operation(summary = "Register", description = "Register to teachme platform")
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "204", description = "Register successful"),
+    @ApiResponse(responseCode = "400", description = "Username already exists")
+  })
   public ResponseEntity<Void> register(@RequestBody UserDto user) {
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/validate")
+  @Operation(summary = "Validate", description = "Validate the token of the request", security = { @SecurityRequirement(name = "bearer-key") })
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "204", description = "Token is valid"),
+    @ApiResponse(responseCode = "400", description = "Invalid token")
+  })
   public ResponseEntity<Void> validate() {
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/me")
+  @Operation(summary = "Me",
+          description = "Get the user of the request",
+          security = { @SecurityRequirement(name = "bearer-key") }) 
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "200", description = "User found"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
   public ResponseEntity<Object> me(@AuthenticationPrincipal User user) {
     return ResponseEntity.ok(user);
   }
