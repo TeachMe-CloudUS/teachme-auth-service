@@ -17,10 +17,10 @@ import lombok.Data;
 @Service
 public class JwtService {
 
-  @Value("${security.jwt.secret-key}")
+  @Value("${jwt.secret-key}")
   private String SECRET_KEY;
 
-  @Value("${security.jwt.expiration-time}")
+  @Value("${jwt.expiration-time}")
   private long EXPIRATION_TIME;
 
   public String generateToken(String userId) {
