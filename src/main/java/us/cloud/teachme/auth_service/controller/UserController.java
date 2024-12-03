@@ -30,7 +30,7 @@ import us.cloud.teachme.auth_service.service.UserService;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 @Tag(name = "User Management", description = "API for managing users in teachme")
 public class UserController {
 
