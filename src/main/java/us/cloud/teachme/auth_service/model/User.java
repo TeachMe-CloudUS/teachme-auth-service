@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Data;
 
@@ -23,10 +24,13 @@ public class User implements UserDetails {
   @Id
   private String id;
 
+  @Schema(description = "Username of the user", example = "john.doe")
   private String username;
   
+  @Schema(description = "Password of the user", example = "P@ssw0rd")
   private String password;
 
+  @Schema(description = "Role of the user", example = "USER | ADMIN")
   private String role;
 
   @Override
@@ -60,6 +64,7 @@ public class User implements UserDetails {
   }
 
   @Override
+  @Schema(name = "enabled", description = "Is the user account enabled", example = "true")
   public boolean isEnabled() {
     return true;
   }

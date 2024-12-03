@@ -25,6 +25,8 @@ public class SecurityConfig {
         .requestMatchers("/api/v1/auth/validate").authenticated()
         .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
         .requestMatchers("/api/v1/user/**").authenticated()
+        .requestMatchers("/v3/api-docs/**").permitAll()
+        .requestMatchers("/swagger-ui/**").permitAll()
         .anyRequest().denyAll()
       )
       .sessionManagement(session -> session.disable())
