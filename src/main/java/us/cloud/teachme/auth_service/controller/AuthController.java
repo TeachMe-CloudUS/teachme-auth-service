@@ -2,6 +2,7 @@ package us.cloud.teachme.auth_service.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,13 +48,13 @@ public class AuthController {
   }
 
   @PostMapping("/register")
-  @Operation(summary = "Register", description = "Register to teachme platform")
+  @Operation(summary = "Register", description = "Register to teachme platform, not implemented yet")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "Register successful"),
     @ApiResponse(responseCode = "400", description = "Username already exists")
   })
   public ResponseEntity<Void> register(@RequestBody UserDto user) {
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @GetMapping("/validate")

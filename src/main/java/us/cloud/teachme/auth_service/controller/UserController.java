@@ -50,7 +50,7 @@ public class UserController {
   }
 
   @GetMapping("/{userId}")
-  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform")
+  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform", security = { @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "User found"),
     @ApiResponse(responseCode = "404", description = "User not found")
