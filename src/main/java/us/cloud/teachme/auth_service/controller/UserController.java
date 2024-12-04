@@ -23,14 +23,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
-import us.cloud.teachme.auth_service.model.UserDto;
 import us.cloud.teachme.auth_service.model.UserValidator;
 import us.cloud.teachme.auth_service.service.UserService;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/v1/users")
 @Tag(name = "User Management", description = "API for managing users in teachme")
 public class UserController {
 
@@ -50,7 +50,7 @@ public class UserController {
   }
 
   @GetMapping("/{userId}")
-  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform")
+  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform", security = { @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
     @ApiResponse(responseCode = "200", description = "User found"),
     @ApiResponse(responseCode = "404", description = "User not found")
@@ -66,8 +66,8 @@ public class UserController {
     @ApiResponse(responseCode = "200", description = "User created"),
     @ApiResponse(responseCode = "400", description = "Invalid user")
   })
-  public ResponseEntity<?> createUser(@Validated @RequestBody UserDto userDto) {
-    User user = User.builder().username(userDto.username()).password(userDto.password()).build();
+  public ResponseEntity<?> createUser(@Validated @RequestBody SignInRequest signInRequest) {
+    User user = User.builder().email(signInRequest.email()).password(signInRequest.password()).build();
     Errors errors = userValidator.validateObject(user);
     if(errors.hasErrors()) {
       return ResponseEntity.badRequest().body(errors.getAllErrors());

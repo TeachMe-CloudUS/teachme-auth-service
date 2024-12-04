@@ -2,6 +2,7 @@ package us.cloud.teachme.auth_service.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +18,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import us.cloud.teachme.auth_service.model.RegisterRequest;
+import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
-import us.cloud.teachme.auth_service.model.UserDto;
 import us.cloud.teachme.auth_service.service.JwtService;
 import us.cloud.teachme.auth_service.service.UserService;
 
@@ -38,22 +40,22 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "Sign in successful"),
     @ApiResponse(responseCode = "400", description = "Invalid username or password")
   })
-  public ResponseEntity<?> signin(@RequestBody UserDto userDto) {
-    User user = userService.findUserByUsername(userDto.username());
-    if(!passwordEncoder.matches(userDto.password(), user.getPassword())) {
+  public ResponseEntity<?> signin(@RequestBody SignInRequest signInRequest) {
+    User user = userService.findUserByEmail(signInRequest.email());
+    if(!passwordEncoder.matches(signInRequest.password(), user.getPassword())) {
       return ResponseEntity.badRequest().body(Map.of("error", "Invalid username or password"));
     }
     return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getId())));
   }
 
   @PostMapping("/register")
-  @Operation(summary = "Register", description = "Register to teachme platform")
+  @Operation(summary = "Register", description = "Register to teachme platform, not implemented yet")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "Register successful"),
     @ApiResponse(responseCode = "400", description = "Username already exists")
   })
-  public ResponseEntity<Void> register(@RequestBody UserDto user) {
-    return ResponseEntity.noContent().build();
+  public ResponseEntity<Void> register(@RequestBody RegisterRequest registerRequest) {
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @GetMapping("/validate")

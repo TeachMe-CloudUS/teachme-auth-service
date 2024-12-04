@@ -6,7 +6,7 @@
 @content-type = application/json
 
 @userId = {{me.response.body.id}}
-@username = Prueba
+@email = Prueba@gmail.com
 @password = 123456
 @token = {{signin.response.body.token}}
 
@@ -24,8 +24,8 @@ POST {{baseurl}}/auth/signin HTTP/1.1
 Content-Type: {{content-type}}
 
 {
-    "username": "Prueba",
-    "password": "123456"
+    "email": {{email}},
+    "password": {{password}}
 }
 
 
@@ -36,8 +36,8 @@ POST {{baseurl}}/auth/register HTTP/1.1
 Content-Type: {{content-type}}
 
 {
-    "username": "Prueba",
-    "password": "123456"
+    "username": {{email}},
+    "password": {{password}}
 }
 
 ###
@@ -62,8 +62,8 @@ POST {{baseurl}}/user HTTP/1.1
 Content-Type: {{content-type}}
 
 {
-    "username": "Prueba",
-    "password": "123456"
+    "email": {{email}},
+    "password": {{password}}
 }
 
 ###
