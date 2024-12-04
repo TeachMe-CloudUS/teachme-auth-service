@@ -23,8 +23,8 @@ public class SecurityConfig {
       .authorizeHttpRequests(authorize -> authorize
         .requestMatchers("/api/v1/auth/**").permitAll()
         .requestMatchers("/api/v1/auth/validate").authenticated()
-        .requestMatchers(HttpMethod.POST, "/api/v1/user").permitAll()
-        .requestMatchers("/api/v1/user/**").authenticated()
+        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+        .requestMatchers("/api/v1/users/**").authenticated()
         .requestMatchers("/v3/api-docs/**").permitAll()
         .requestMatchers("/swagger-ui/**").permitAll()
         .anyRequest().denyAll()
