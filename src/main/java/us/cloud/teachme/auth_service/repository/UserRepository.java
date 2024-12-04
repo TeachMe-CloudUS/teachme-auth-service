@@ -9,6 +9,6 @@ import us.cloud.teachme.auth_service.model.User;
 
 public interface UserRepository extends MongoRepository<User, String>{
 
-  List<User> findByUsername(String username);
+  List<User> findByEmail(String email);
   
 }

@@ -27,12 +27,12 @@ public class UserService {
     return userRepository.findById(id).orElseThrow(UserNotFoundException::new);
   }
 
-  public User findUserByUsername(String username) {
-    return userRepository.findByUsername(username).stream().findFirst().orElseThrow(UserNotFoundException::new);
+  public User findUserByEmail(String email) {
+    return userRepository.findByEmail(email).stream().findFirst().orElseThrow(UserNotFoundException::new);
   }
 
   public User createUser(User user) {
-    if(!userRepository.findByUsername(user.getUsername()).isEmpty()) {
+    if(!userRepository.findByEmail(user.getEmail()).isEmpty()) {
       throw new UserAlreadyExistsException();
     }
     user.setPassword(passwordEncoder.encode(user.getPassword()));
