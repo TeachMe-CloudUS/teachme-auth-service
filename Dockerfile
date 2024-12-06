@@ -9,8 +9,6 @@ RUN chmod +x mvnw
 RUN --mount=type=secret,id=maven_settings,target=/root/.m2/settings.xml \
     ./mvnw clean package -DskipTests
 
-RUN ls -l /app/target
-
 FROM eclipse-temurin:23-jre-alpine
 
 WORKDIR /app
