@@ -8,6 +8,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import us.cloud.teachme.auth_service.filters.JwtAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
