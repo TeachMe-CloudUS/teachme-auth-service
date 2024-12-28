@@ -1,4 +1,4 @@
-package us.cloud.teachme.auth_service.config;
+package us.cloud.teachme.auth_service.filters;
 
 import java.io.IOException;
 
