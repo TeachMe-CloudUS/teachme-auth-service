@@ -27,242 +27,256 @@ import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
 import us.cloud.teachme.auth_service.service.JwtService;
+import us.cloud.teachme.auth_service.service.MailService;
 import us.cloud.teachme.auth_service.service.UserService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 public class UserControllerTest {
 
-  @MockBean
-  private UserService userService;
+        @MockBean
+        private UserService userService;
 
-  @MockBean
-  private UserRepository userRepository;
+        @MockBean
+        private UserRepository userRepository;
 
-  @MockBean
-  private JwtService jwtService;
+        @MockBean
+        private JwtService jwtService;
 
-  @MockBean
-  private PasswordEncoder passwordEncoder;
+        @MockBean
+        private PasswordEncoder passwordEncoder;
 
-  @Autowired
-  private MockMvc mockMvc;
+        @MockBean
+        private MailService mailService;
 
-  @Autowired
-  private ObjectMapper objectMapper;
+        @Autowired
+        private MockMvc mockMvc;
 
-  @Test
-  public void testFindAllUsersSuccess() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("ADMIN")
-        .build();
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    Claims claims = new DefaultClaims(Map.of("sub", "1L"));
+        @Test
+        public void testFindAllUsersSuccess() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("ADMIN")
+                                .build();
 
-    when(userService.findAllUsers()).thenReturn(List.of(user));
+                Claims claims = new DefaultClaims(Map.of("sub", "1L"));
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+                when(userService.findAllUsers()).thenReturn(List.of(user));
 
-    mockMvc.perform(get("/api/v1/users")
-        .header("Authorization", "Bearer jwtToken"))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$").isArray())
-        .andExpect(jsonPath("$").isNotEmpty())
-        .andExpect(jsonPath("$[0].email").value("test@example.com"));
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(jwtService.extractToken("jwtToken")).thenReturn(claims);
 
-  @Test
-  public void testFindAllUsersNonAdminFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("USER")
-        .build();
+                mockMvc.perform(get("/api/v1/users")
+                                .header("Authorization", "Bearer jwtToken"))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$").isArray())
+                                .andExpect(jsonPath("$").isNotEmpty())
+                                .andExpect(jsonPath("$[0].email").value("test@example.com"));
+        }
 
-    Claims claims = new DefaultClaims(Map.of("sub", "1L"));
+        @Test
+        public void testFindAllUsersNonAdminFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("USER")
+                                .build();
 
-    when(userService.findAllUsers()).thenReturn(List.of(user));
+                Claims claims = new DefaultClaims(Map.of("sub", "1L"));
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+                when(userService.findAllUsers()).thenReturn(List.of(user));
 
-    mockMvc.perform(get("/api/v1/users")
-        .header("Authorization", "Bearer jwtToken"))
-        .andExpect(status().isUnauthorized());
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(jwtService.extractToken("jwtToken")).thenReturn(claims);
 
-  @Test
-  public void testFindAllUsersNonAuthenticatedFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("USER")
-        .build();
+                mockMvc.perform(get("/api/v1/users")
+                                .header("Authorization", "Bearer jwtToken"))
+                                .andExpect(status().isUnauthorized());
+        }
 
-    when(userService.findAllUsers()).thenReturn(List.of(user));
+        @Test
+        public void testFindAllUsersNonAuthenticatedFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("USER")
+                                .build();
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(jwtService.extractToken("jwtToken")).thenThrow(new RuntimeException());
+                when(userService.findAllUsers()).thenReturn(List.of(user));
 
-    mockMvc.perform(get("/api/v1/users"))
-        .andExpect(status().isForbidden());
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(jwtService.extractToken("jwtToken")).thenThrow(new RuntimeException());
 
-  @Test
-  public void testCreateUserSuccess() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("password")
-        .role("USER")
-        .build();
+                mockMvc.perform(get("/api/v1/users"))
+                                .andExpect(status().isForbidden());
+        }
 
-    SignInRequest signInRequest = new SignInRequest("test@example.com", "password");
+        @Test
+        public void testCreateUserSuccess() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("password")
+                                .role("USER")
+                                .build();
 
-    when(userService.createUser(User.builder().email(signInRequest.email()).password(signInRequest.password()).build()))
-        .thenReturn(user);
-    mockMvc.perform(post("/api/v1/users")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isOk())
-        .andExpect(jsonPath("$.userId").value("1L"));
-  }
+                SignInRequest signInRequest = new SignInRequest("test@example.com", "password");
 
-  @Test
-  public void testCreateUserEmptyEmailFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("password")
-        .role("USER")
-        .build();
+                when(userService
+                                .createUser(User.builder().email(signInRequest.email())
+                                                .password(signInRequest.password()).build()))
+                                .thenReturn(user);
+                mockMvc.perform(post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(signInRequest)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.userId").value("1L"));
+        }
 
-    SignInRequest signInRequest = new SignInRequest("", "password");
+        @Test
+        public void testCreateUserEmptyEmailFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("password")
+                                .role("USER")
+                                .build();
 
-    when(userService.createUser(User.builder().email(signInRequest.email()).password(signInRequest.password()).build()))
-        .thenReturn(user);
-    mockMvc.perform(post("/api/v1/users")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$[0].defaultMessage").value("The email can't be null"));
-  }
+                SignInRequest signInRequest = new SignInRequest("", "password");
 
-  @Test
-  public void testCreateUserInvalidEmailLengthFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("password")
-        .role("USER")
-        .build();
+                when(userService
+                                .createUser(User.builder().email(signInRequest.email())
+                                                .password(signInRequest.password()).build()))
+                                .thenReturn(user);
+                mockMvc.perform(post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(signInRequest)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$[0].defaultMessage").value("The email can't be null"));
+        }
 
-    SignInRequest signInRequest = new SignInRequest(
-        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@gmail.com",
-        "password");
+        @Test
+        public void testCreateUserInvalidEmailLengthFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("password")
+                                .role("USER")
+                                .build();
 
-    when(userService.createUser(User.builder().email(signInRequest.email()).password(signInRequest.password()).build()))
-        .thenReturn(user);
-    mockMvc.perform(post("/api/v1/users")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$[0].defaultMessage").value("The email length must be between 4 and 30 characters"));
-  }
+                SignInRequest signInRequest = new SignInRequest(
+                                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa@gmail.com",
+                                "password");
 
-  @Test
-  public void testCreateUserInvalidEmailFormatFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("password")
-        .role("USER")
-        .build();
+                when(userService
+                                .createUser(User.builder().email(signInRequest.email())
+                                                .password(signInRequest.password()).build()))
+                                .thenReturn(user);
+                mockMvc.perform(post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(signInRequest)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(
+                                                jsonPath("$[0].defaultMessage").value(
+                                                                "The email length must be between 4 and 60 characters"));
+        }
 
-    SignInRequest signInRequest = new SignInRequest("ta.a", "password");
+        @Test
+        public void testCreateUserInvalidEmailFormatFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("password")
+                                .role("USER")
+                                .build();
 
-    when(userService.createUser(User.builder().email(signInRequest.email()).password(signInRequest.password()).build()))
-        .thenReturn(user);
-    mockMvc.perform(post("/api/v1/users")
-        .contentType(MediaType.APPLICATION_JSON)
-        .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("$[0].defaultMessage").value("The email is invalid"));
-  }
+                SignInRequest signInRequest = new SignInRequest("ta.a", "password");
 
-  @Test
-  public void testDeleteUserSuccess() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("USER")
-        .build();
+                when(userService
+                                .createUser(User.builder().email(signInRequest.email())
+                                                .password(signInRequest.password()).build()))
+                                .thenReturn(user);
+                mockMvc.perform(post("/api/v1/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(signInRequest)))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$[0].defaultMessage").value("The email is invalid"));
+        }
 
-    Claims claims = new DefaultClaims(Map.of("sub", "1L"));
+        @Test
+        public void testDeleteUserSuccess() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("USER")
+                                .build();
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+                Claims claims = new DefaultClaims(Map.of("sub", "1L"));
 
-    mockMvc.perform(delete("/api/v1/users/" + user.getId())
-        .header("Authorization", "Bearer jwtToken"))
-        .andExpect(status().isOk());
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(jwtService.extractToken("jwtToken")).thenReturn(claims);
 
-  @Test
-  public void testDeleteUserAdminSuccess() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("USER")
-        .build();
+                mockMvc.perform(delete("/api/v1/users/" + user.getId())
+                                .header("Authorization", "Bearer jwtToken"))
+                                .andExpect(status().isOk());
+        }
 
-    User loggedUser = User.builder()
-        .id("2L")
-        .role("ADMIN")
-        .build();
+        @Test
+        public void testDeleteUserAdminSuccess() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("USER")
+                                .build();
 
-    Claims claims = new DefaultClaims(Map.of("sub", loggedUser.getId()));
+                User loggedUser = User.builder()
+                                .id("2L")
+                                .role("ADMIN")
+                                .build();
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(userService.findUserById(loggedUser.getId())).thenReturn(loggedUser);
-    when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+                Claims claims = new DefaultClaims(Map.of("sub", loggedUser.getId()));
 
-    mockMvc.perform(delete("/api/v1/users/" + user.getId())
-        .header("Authorization", "Bearer jwtToken"))
-        .andExpect(status().isOk());
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(userService.findUserById(loggedUser.getId())).thenReturn(loggedUser);
+                when(jwtService.extractToken("jwtToken")).thenReturn(claims);
 
-  @Test
-  public void testDeleteUserFailure() throws Exception {
-    User user = User.builder()
-        .id("1L")
-        .email("test@example.com")
-        .password("encodedPassword")
-        .role("USER")
-        .build();
+                mockMvc.perform(delete("/api/v1/users/" + user.getId())
+                                .header("Authorization", "Bearer jwtToken"))
+                                .andExpect(status().isOk());
+        }
 
-    User loggedUser = User.builder()
-        .id("2L")
-        .role("USER")
-        .build();
+        @Test
+        public void testDeleteUserFailure() throws Exception {
+                User user = User.builder()
+                                .id("1L")
+                                .email("test@example.com")
+                                .password("encodedPassword")
+                                .role("USER")
+                                .build();
 
-    Claims claims = new DefaultClaims(Map.of("sub", loggedUser.getId()));
+                User loggedUser = User.builder()
+                                .id("2L")
+                                .role("USER")
+                                .build();
 
-    when(userService.findUserById(user.getId())).thenReturn(user);
-    when(userService.findUserById(loggedUser.getId())).thenReturn(loggedUser);
-    when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+                Claims claims = new DefaultClaims(Map.of("sub", loggedUser.getId()));
 
-    mockMvc.perform(delete("/api/v1/users/" + user.getId())
-        .header("Authorization", "Bearer jwtToken"))
-        .andExpect(status().isUnauthorized());
-  }
+                when(userService.findUserById(user.getId())).thenReturn(user);
+                when(userService.findUserById(loggedUser.getId())).thenReturn(loggedUser);
+                when(jwtService.extractToken("jwtToken")).thenReturn(claims);
+
+                mockMvc.perform(delete("/api/v1/users/" + user.getId())
+                                .header("Authorization", "Bearer jwtToken"))
+                                .andExpect(status().isUnauthorized());
+        }
 
 }
