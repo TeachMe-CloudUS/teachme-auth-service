@@ -27,6 +27,7 @@ import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
 import us.cloud.teachme.auth_service.service.JwtService;
+import us.cloud.teachme.auth_service.service.MailService;
 import us.cloud.teachme.auth_service.service.UserService;
 
 @AutoConfigureMockMvc
@@ -45,6 +46,9 @@ public class AuthControllerTest {
   @MockBean
   private PasswordEncoder passwordEncoder;
 
+  @MockBean
+  private MailService mailService;
+
   @Autowired
   private MockMvc mockMvc;
 
@@ -54,10 +58,10 @@ public class AuthControllerTest {
   @Test
   public void testSignInSuccess() throws Exception {
     User user = User.builder()
-      .id("1L")
-      .email("test@example.com")
-      .password("encodedPassword")
-      .build();
+        .id("1L")
+        .email("test@example.com")
+        .password("encodedPassword")
+        .build();
 
     SignInRequest signInRequest = new SignInRequest("test@example.com", "password");
 
@@ -66,10 +70,10 @@ public class AuthControllerTest {
     when(jwtService.generateToken(user.getId())).thenReturn("jwtToken");
 
     mockMvc.perform(post("/api/v1/auth/signin")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(signInRequest)))
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.token").value("jwtToken"));
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(signInRequest)))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.token").value("jwtToken"));
   }
 
   @Test
@@ -79,19 +83,19 @@ public class AuthControllerTest {
     when(userService.findUserByEmail("test@example.com")).thenThrow(new UserNotFoundException());
 
     mockMvc.perform(post("/api/v1/auth/signin")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(signInRequest)))
-    .andExpect(status().isBadRequest());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(signInRequest)))
+        .andExpect(status().isBadRequest());
 
   }
 
   @Test
   public void testSignInBadCredentials() throws Exception {
     User user = User.builder()
-      .id("1L")
-      .email("test@example.com")
-      .password("encodedPassword")
-      .build();
+        .id("1L")
+        .email("test@example.com")
+        .password("encodedPassword")
+        .build();
 
     SignInRequest signInRequest = new SignInRequest("test@example.com", "password");
 
@@ -99,9 +103,9 @@ public class AuthControllerTest {
     when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(false);
 
     mockMvc.perform(post("/api/v1/auth/signin")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(signInRequest)))
-    .andExpect(status().isBadRequest());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(signInRequest)))
+        .andExpect(status().isBadRequest());
   }
 
   @Test
@@ -109,9 +113,9 @@ public class AuthControllerTest {
     RegisterRequest registerRequest = new RegisterRequest("test@example.com", "password");
 
     mockMvc.perform(post("/api/v1/auth/register")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content(objectMapper.writeValueAsString(registerRequest)))
-    .andExpect(status().isNotImplemented());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(objectMapper.writeValueAsString(registerRequest)))
+        .andExpect(status().isNotImplemented());
   }
 
   @Test
@@ -122,9 +126,9 @@ public class AuthControllerTest {
     when(userService.findUserById("1L")).thenReturn(user);
 
     mockMvc.perform(get("/api/v1/auth/validate")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content("{\"token\": \"jwtToken\"}"))
-    .andExpect(status().isNoContent());
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"token\": \"jwtToken\"}"))
+        .andExpect(status().isNoContent());
   }
 
   @Test
@@ -135,12 +139,12 @@ public class AuthControllerTest {
 
     when(userService.findUserById("1L")).thenReturn(user);
     when(jwtService.extractToken("jwtToken")).thenReturn(claims);
-    
+
     mockMvc.perform(get("/api/v1/auth/me")
-      .header("Authorization", "Bearer jwtToken")
-      .contentType(MediaType.APPLICATION_JSON)
-      .content("{\"token\": \"jwtToken\"}"))
-    .andExpect(status().isOk())
-    .andExpect(jsonPath("$.email").value("test@example.com"));
+        .header("Authorization", "Bearer jwtToken")
+        .contentType(MediaType.APPLICATION_JSON)
+        .content("{\"token\": \"jwtToken\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.email").value("test@example.com"));
   }
 }
