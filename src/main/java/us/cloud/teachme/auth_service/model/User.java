@@ -34,6 +34,9 @@ public class User {
   @Schema(description = "Role of the user", example = "USER | ADMIN")
   private String role;
 
+  @Schema(name = "enabled", description = "Is the user account enabled", example = "true")
+  private boolean enabled;
+
   @JsonIgnore
   public String getPassword() {
     return password;
@@ -43,12 +46,5 @@ public class User {
   public Collection<? extends GrantedAuthority> getAuthorities() {
     return List.of(new SimpleGrantedAuthority(role));
   }
-
-  @Schema(name = "enabled", description = "Is the user account enabled", example = "true")
-  public boolean isEnabled() {
-    return true;
-  }
-
-  
 
 }

@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -78,6 +80,19 @@ public class AuthController {
   })
   public ResponseEntity<Object> me(@AuthenticationPrincipal User user) {
     return ResponseEntity.ok(user);
+  }
+
+  @GetMapping("/activate")
+  @Operation(summary = "Activate", description = "Activate the user with the given code", parameters = {
+    @Parameter(name = "code", description = "The activation code", required = true)
+  })
+  @ApiResponses(value = {
+    @ApiResponse(responseCode = "301", description = "User activated"),
+    @ApiResponse(responseCode = "404", description = "User not found")
+  })
+  public ResponseEntity<Object> activate(@RequestParam("code") String code) {
+    userService.activateUser(code);
+    return ResponseEntity.status(HttpStatus.MOVED_PERMANENTLY).header("Location", "/").build();
   }
 
 }

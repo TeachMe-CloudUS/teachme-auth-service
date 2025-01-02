@@ -8,6 +8,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+import us.cloud.teachme.auth_service.filters.JwtAuthenticationFilter;
 
 @Configuration
 @RequiredArgsConstructor
@@ -24,9 +25,11 @@ public class SecurityConfig {
         .requestMatchers("/api/v1/auth/**").permitAll()
         .requestMatchers("/api/v1/auth/validate").authenticated()
         .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+        .requestMatchers("/api/v1/auth/activate").permitAll()
         .requestMatchers("/api/v1/users/**").authenticated()
         .requestMatchers("/v3/api-docs/**").permitAll()
         .requestMatchers("/swagger-ui/**").permitAll()
+        .requestMatchers("/api/health").permitAll()
         .anyRequest().denyAll()
       )
       .sessionManagement(session -> session.disable())
