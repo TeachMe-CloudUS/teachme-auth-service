@@ -12,6 +12,6 @@ sendgrid:
 
 # Kafka server configuration
 kafka-config:
-  bootstrap-server: http://kafka:9092
+  bootstrap-server: ${KAFKA_SERVICE_URI:http://localhost:9092}
   # The service name, e.g student-service for convention
   group-id: auth-service
