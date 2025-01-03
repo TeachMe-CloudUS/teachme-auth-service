@@ -9,3 +9,9 @@ sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from: ${SENDGRID_FROM:noreply@teachme.com}
   base-url: ${BASE_URL:http://localhost:8080}
+
+springdoc:
+  swagger-ui:
+    path: /swagger/auth-service/index.html
+  api-docs:
+    path: /swagger/auth-service/api-docs
