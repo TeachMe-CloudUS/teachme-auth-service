@@ -23,14 +23,15 @@ public class MailService {
   @Value("${sendgrid.from}")
   private String SENDGRID_FROM;
 
-  @Value("${sendgrid.base-url}")
+  @Value("${base-url}")
   private String BASE_URL;
 
   public void sendActivationMail(ActivationCode code) {
     Email from = new Email(SENDGRID_FROM);
     String subject = "[Teachme] Activate your account";
     Email to = new Email(code.getEmail());
-    Content content = new Content("text/html", "Your activation code is: " + code.getId() + "<br>Click <a href='" + BASE_URL + "/api/v1/auth/activate?code=" + code.getId() + "'>here</a> to activate your account");
+    Content content = new Content("text/html", "Your activation code is: " + code.getId() + "<br>Click <a href='"
+        + BASE_URL + "/api/v1/auth/activate?code=" + code.getId() + "'>here</a> to activate your account");
     Mail mail = new Mail(from, subject, to, content);
 
     SendGrid sg = new SendGrid(SEND_GRID_API_KEY);
@@ -44,5 +45,5 @@ public class MailService {
       System.out.println(ex.getMessage());
     }
   }
-  
+
 }

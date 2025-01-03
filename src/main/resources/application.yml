@@ -5,10 +5,11 @@ spring:
     mongodb:
       uri: ${MONGODB_URI}
 
+base-url: ${BASE_URL:http://localhost:8080}
+
 sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from: ${SENDGRID_FROM:noreply@teachme.com}
-  base-url: ${BASE_URL:http://localhost:8080}
 
 springdoc:
   swagger-ui:
