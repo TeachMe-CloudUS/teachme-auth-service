@@ -41,7 +41,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           flavor: |
-            latest: true
+            latest=true
 
       - name: Set up maven settings
         uses: s4u/maven-settings-action@v3.1.0
