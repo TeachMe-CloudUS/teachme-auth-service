@@ -1,0 +1,9 @@
+jwt:
+  secret-key: ThisIsATestSecretKey
+  expiration-time: 3600000
+
+base-url: ${BASE_URL:http://localhost:8080}
+
+sendgrid:
+  api-key: ThiIsATestApiKey
+  from: noreply@teachme.com

@@ -29,7 +29,7 @@ public class MailService {
   @Value("${sendgrid.from}")
   private String SENDGRID_FROM;
 
-  @Value("${sendgrid.base-url}")
+  @Value("${base-url}")
   private String BASE_URL;
 
   private final KafkaTemplate<String, Object> kafkaTemplate;

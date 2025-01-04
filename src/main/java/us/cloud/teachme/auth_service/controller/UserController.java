@@ -39,21 +39,24 @@ public class UserController {
   private final UserValidator userValidator;
 
   @GetMapping
-  @Operation(summary = "Get all users", description = "Get all users from teachme platform", security = { @SecurityRequirement(name = "bearer-key")} )
+  @Operation(summary = "Get all users", description = "Get all users from teachme platform", security = {
+      @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "List of users"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
+      @ApiResponse(responseCode = "200", description = "List of users"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
   })
   public ResponseEntity<List<User>> findAllUsers(@AuthenticationPrincipal User user) {
-    if(user == null || !user.getRole().equals("ADMIN")) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    if (user == null || !user.getRole().equals("ADMIN"))
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     return ResponseEntity.ok(userService.findAllUsers());
   }
 
   @GetMapping("/{userId}")
-  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform", security = { @SecurityRequirement(name = "bearer-key") })
+  @Operation(summary = "Get user by id", description = "Get user by id from teachme platform", security = {
+      @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "User found"),
-    @ApiResponse(responseCode = "404", description = "User not found")
+      @ApiResponse(responseCode = "200", description = "User found"),
+      @ApiResponse(responseCode = "404", description = "User not found")
   })
   public ResponseEntity<User> findById(@PathVariable String userId) {
     User user = userService.findUserById(userId);
@@ -63,29 +66,31 @@ public class UserController {
   @PostMapping
   @Operation(summary = "Create user", description = "Create user in teachme platform")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "User created"),
-    @ApiResponse(responseCode = "400", description = "Invalid user")
+      @ApiResponse(responseCode = "200", description = "User created"),
+      @ApiResponse(responseCode = "400", description = "Invalid user")
   })
   public ResponseEntity<?> createUser(@Validated @RequestBody SignInRequest signInRequest) {
     User user = User.builder().email(signInRequest.email()).password(signInRequest.password()).build();
     Errors errors = userValidator.validateObject(user);
-    if(errors.hasErrors()) {
+    if (errors.hasErrors()) {
       return ResponseEntity.badRequest().body(errors.getAllErrors());
     }
     return ResponseEntity.ok(Map.of("userId", userService.createUser(user).getId()));
   }
 
   @DeleteMapping("/{userId}")
-  @Operation(summary = "Delete user", description = "Delete user from teachme platform", security = { @SecurityRequirement(name = "bearer-key") })
+  @Operation(summary = "Delete user", description = "Delete user from teachme platform", security = {
+      @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "User deleted"),
-    @ApiResponse(responseCode = "404", description = "User not found"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+      @ApiResponse(responseCode = "200", description = "User deleted"),
+      @ApiResponse(responseCode = "404", description = "User not found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
   })
   public ResponseEntity<Void> deleteUser(@PathVariable String userId, @AuthenticationPrincipal User user) {
-    if(user == null || (user.getRole().equals("ADMIN") && !user.getId().equals(userId))) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    if (user == null || (!user.getRole().equals("ADMIN") && !user.getId().equals(userId)))
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     userService.deleteUser(userId);
     return ResponseEntity.ok().build();
   }
-  
+
 }
