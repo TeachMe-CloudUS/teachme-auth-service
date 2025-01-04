@@ -4,11 +4,13 @@ import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 
 import us.cloud.teachme.auth_service.model.KafkaTopics;
 import us.cloud.teachme.kafkaconfig.service.KafkaUtils;
 
 @Configuration
+@Profile("!test")
 @Import(us.cloud.teachme.kafkaconfig.config.KafkaConfig.class)
 public class KafkaConfig {
 
