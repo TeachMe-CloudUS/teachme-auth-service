@@ -22,16 +22,17 @@ public class AuthServiceApplication {
 	}
 
 	@Bean
-  PasswordEncoder passwordEncoder() {
-    return new BCryptPasswordEncoder();
-  }
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
 	@Bean
 	CommandLineRunner init(UserRepository userRepository, PasswordEncoder passwordEncoder) {
 		return args -> {
 			List<User> users = userRepository.findByEmail("admin@teachme.com");
-			if(users.isEmpty()) {
-				User user = User.builder().email("admin@gmail.com").password(passwordEncoder.encode("123456")).role("ADMIN").enabled(true).build();
+			if (users.isEmpty()) {
+				User user = User.builder().email("admin@gmail.com").password(passwordEncoder.encode("123456")).role("ADMIN")
+						.enabled(true).build();
 				userRepository.save(user);
 			} else {
 				User user = users.get(0);
