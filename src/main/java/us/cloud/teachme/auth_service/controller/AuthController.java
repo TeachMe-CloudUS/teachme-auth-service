@@ -39,44 +39,44 @@ public class AuthController {
   @PostMapping("/signin")
   @Operation(summary = "Sign in", description = "Sign in to teachme platform")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "Sign in successful"),
-    @ApiResponse(responseCode = "400", description = "Invalid username or password")
+      @ApiResponse(responseCode = "200", description = "Sign in successful"),
+      @ApiResponse(responseCode = "400", description = "Invalid username or password")
   })
   public ResponseEntity<?> signin(@RequestBody SignInRequest signInRequest) {
     User user = userService.findUserByEmail(signInRequest.email());
-    if(!passwordEncoder.matches(signInRequest.password(), user.getPassword())) {
+    if (!passwordEncoder.matches(signInRequest.password(), user.getPassword())) {
       return ResponseEntity.badRequest().body(Map.of("error", "Invalid username or password"));
     }
-    return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user.getId())));
+    return ResponseEntity.ok(Map.of("token", jwtService.generateToken(user)));
   }
 
   @PostMapping("/register")
   @Operation(summary = "Register", description = "Register to teachme platform, not implemented yet")
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "204", description = "Register successful"),
-    @ApiResponse(responseCode = "400", description = "Username already exists")
+      @ApiResponse(responseCode = "204", description = "Register successful"),
+      @ApiResponse(responseCode = "400", description = "Username already exists")
   })
   public ResponseEntity<Void> register(@RequestBody RegisterRequest registerRequest) {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @GetMapping("/validate")
-  @Operation(summary = "Validate", description = "Validate the token of the request", security = { @SecurityRequirement(name = "bearer-key") })
+  @Operation(summary = "Validate", description = "Validate the token of the request", security = {
+      @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "204", description = "Token is valid"),
-    @ApiResponse(responseCode = "400", description = "Invalid token")
+      @ApiResponse(responseCode = "204", description = "Token is valid"),
+      @ApiResponse(responseCode = "400", description = "Invalid token")
   })
   public ResponseEntity<Void> validate() {
     return ResponseEntity.noContent().build();
   }
 
   @GetMapping("/me")
-  @Operation(summary = "Me",
-          description = "Get the user of the request",
-          security = { @SecurityRequirement(name = "bearer-key") }) 
+  @Operation(summary = "Me", description = "Get the user of the request", security = {
+      @SecurityRequirement(name = "bearer-key") })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "200", description = "User found"),
-    @ApiResponse(responseCode = "401", description = "Unauthorized")
+      @ApiResponse(responseCode = "200", description = "User found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
   })
   public ResponseEntity<Object> me(@AuthenticationPrincipal User user) {
     return ResponseEntity.ok(user);
@@ -84,11 +84,11 @@ public class AuthController {
 
   @GetMapping("/activate")
   @Operation(summary = "Activate", description = "Activate the user with the given code", parameters = {
-    @Parameter(name = "code", description = "The activation code", required = true)
+      @Parameter(name = "code", description = "The activation code", required = true)
   })
   @ApiResponses(value = {
-    @ApiResponse(responseCode = "301", description = "User activated"),
-    @ApiResponse(responseCode = "404", description = "User not found")
+      @ApiResponse(responseCode = "301", description = "User activated"),
+      @ApiResponse(responseCode = "404", description = "User not found")
   })
   public ResponseEntity<Object> activate(@RequestParam("code") String code) {
     userService.activateUser(code);
