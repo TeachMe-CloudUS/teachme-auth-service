@@ -12,6 +12,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.Data;
+import us.cloud.teachme.auth_service.model.User;
 
 @Data
 @Service
@@ -23,14 +24,16 @@ public class JwtService {
   @Value("${jwt.expiration-time}")
   private long EXPIRATION_TIME;
 
-  public String generateToken(String userId) {
+  public String generateToken(User user) {
     long actualTime = System.currentTimeMillis();
     return Jwts.builder()
-      .subject(userId)
-      .issuedAt(new Date(actualTime))
-      .expiration(new Date(actualTime + EXPIRATION_TIME))
-      .signWith(getSignKey())
-      .compact();
+        .subject(user.getId())
+        .claim("role", user.getRole())
+        .claim("enabled", user.isEnabled())
+        .issuedAt(new Date(actualTime))
+        .expiration(new Date(actualTime + EXPIRATION_TIME))
+        .signWith(getSignKey())
+        .compact();
   }
 
   public void validateToken(String token) {
@@ -44,5 +47,5 @@ public class JwtService {
   private SecretKey getSignKey() {
     return Keys.hmacShaKeyFor(Decoders.BASE64.decode(SECRET_KEY));
   }
-  
+
 }

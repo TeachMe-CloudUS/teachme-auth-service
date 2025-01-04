@@ -11,6 +11,12 @@ sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from: ${SENDGRID_FROM:noreply@teachme.com}
 
+# Kafka server configuration
+kafka-config:
+  bootstrap-server: ${KAFKA_SERVICE_URI:http://localhost:9092}
+  # The service name, e.g student-service for convention
+  group-id: auth-service
+
 springdoc:
   swagger-ui:
     path: /swagger/auth-service/index.html

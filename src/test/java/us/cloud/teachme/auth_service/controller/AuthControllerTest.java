@@ -8,13 +8,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Map;
 
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +35,7 @@ import us.cloud.teachme.auth_service.service.UserService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ActiveProfiles("test")
 public class AuthControllerTest {
 
   @MockBean
@@ -48,6 +52,12 @@ public class AuthControllerTest {
 
   @MockBean
   private MailService mailService;
+
+  @MockBean
+  private KafkaTemplate<String, Object> kafkaTemplate;
+
+  @MockBean
+  private KafkaConsumer<String, Object> kafkaConsumer;
 
   @Autowired
   private MockMvc mockMvc;
@@ -67,7 +77,7 @@ public class AuthControllerTest {
 
     when(userService.findUserByEmail(user.getEmail())).thenReturn(user);
     when(passwordEncoder.matches("password", "encodedPassword")).thenReturn(true);
-    when(jwtService.generateToken(user.getId())).thenReturn("jwtToken");
+    when(jwtService.generateToken(user)).thenReturn("jwtToken");
 
     mockMvc.perform(post("/api/v1/auth/signin")
         .contentType(MediaType.APPLICATION_JSON)
