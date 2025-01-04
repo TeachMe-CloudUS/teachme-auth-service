@@ -34,7 +34,7 @@ public class MailService {
 
   private final KafkaTemplate<String, Object> kafkaTemplate;
 
-  public void sendActivationMail(ActivationCode code) {
+  public void sendActivationMail(String userId, ActivationCode code) {
     Email from = new Email(SENDGRID_FROM);
     String subject = "[Teachme] Activate your account";
     Email to = new Email(code.getEmail());
@@ -52,6 +52,7 @@ public class MailService {
       if (response.getStatusCode() != 202) {
         System.out.println("Error sending email: " + response.getBody());
         kafkaTemplate.send(KafkaTopics.MAIL_SEND.getTopic(), Map.of(
+            "usedId", userId,
             "email", code.getEmail(),
             "code", code.getId(),
             "status", response.getStatusCode(),
@@ -60,6 +61,7 @@ public class MailService {
     } catch (IOException ex) {
       System.out.println(ex.getMessage());
       kafkaTemplate.send(KafkaTopics.MAIL_SEND.getTopic(), Map.of(
+          "usedId", userId,
           "email", code.getEmail(),
           "code", code.getId(),
           "status", "undefined",

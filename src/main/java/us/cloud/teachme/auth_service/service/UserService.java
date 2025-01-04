@@ -58,8 +58,8 @@ public class UserService {
     code = activationCode
         .orElse(activationCodeRepository.save(ActivationCode.builder().email(user.getEmail()).build()));
 
-    mailService.sendActivationMail(code);
     User savedUser = userRepository.save(user);
+    mailService.sendActivationMail(savedUser.getId(), code);
     kafkaTemplate.send(KafkaTopics.USER_CREATED.getTopic(), savedUser);
     return savedUser;
   }
