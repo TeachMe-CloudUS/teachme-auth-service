@@ -23,9 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
-import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
+import us.cloud.teachme.auth_service.request.SignInRequest;
 import us.cloud.teachme.auth_service.service.JwtService;
 import us.cloud.teachme.auth_service.service.MailService;
 import us.cloud.teachme.auth_service.service.UserService;
