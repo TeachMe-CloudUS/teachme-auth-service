@@ -3,11 +3,12 @@ package us.cloud.teachme.auth_service.service;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import us.cloud.teachme.auth_service.exceptions.UserAlreadyExistsException;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
 import us.cloud.teachme.auth_service.model.ActivationCode;
@@ -17,7 +18,7 @@ import us.cloud.teachme.auth_service.repository.ActivationCodeRepository;
 import us.cloud.teachme.auth_service.repository.UserRepository;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
 
   private final UserRepository userRepository;
@@ -28,7 +29,8 @@ public class UserService {
 
   private final ActivationCodeRepository activationCodeRepository;
 
-  private final KafkaTemplate<String, Object> kafkaTemplate;
+  @Autowired(required = false)
+  private KafkaTemplate<String, Object> kafkaTemplate;
 
   public List<User> findAllUsers() {
     return userRepository.findAll();
@@ -60,14 +62,16 @@ public class UserService {
 
     User savedUser = userRepository.save(user);
     mailService.sendActivationMail(savedUser.getId(), code);
-    kafkaTemplate.send(KafkaTopics.USER_CREATED.getTopic(), savedUser);
+    if (kafkaTemplate != null)
+      kafkaTemplate.send(KafkaTopics.USER_CREATED.getTopic(), savedUser);
     return savedUser;
   }
 
   public void deleteUser(String id) {
     User user = findUserById(id);
     userRepository.deleteById(id);
-    kafkaTemplate.send(KafkaTopics.USER_DELETED.getTopic(), user);
+    if (kafkaTemplate != null)
+      kafkaTemplate.send(KafkaTopics.USER_DELETED.getTopic(), user);
   }
 
   public void activateUser(String code) {
@@ -76,7 +80,8 @@ public class UserService {
     user.setEnabled(true);
     user = userRepository.save(user);
     activationCodeRepository.deleteById(code);
-    kafkaTemplate.send(KafkaTopics.USER_ACTIVATED.getTopic(), user);
+    if (kafkaTemplate != null)
+      kafkaTemplate.send(KafkaTopics.USER_ACTIVATED.getTopic(), user);
   }
 
 }

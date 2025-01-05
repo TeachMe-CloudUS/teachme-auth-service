@@ -4,18 +4,15 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+  kafka:
+    enabled: false
+    bootstrap-servers: localhost:9092
 
 base-url: ${BASE_URL:http://localhost:8080}
 
 sendgrid:
   api-key: ${SENDGRID_API_KEY}
   from: ${SENDGRID_FROM:noreply@teachme.com}
-
-# Kafka server configuration
-kafka-config:
-  bootstrap-server: ${KAFKA_SERVICE_URI:http://localhost:9092}
-  # The service name, e.g student-service for convention
-  group-id: auth-service
 
 springdoc:
   swagger-ui:
