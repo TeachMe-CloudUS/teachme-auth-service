@@ -20,9 +20,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import us.cloud.teachme.auth_service.model.RegisterRequest;
-import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
+import us.cloud.teachme.auth_service.request.RegisterRequest;
+import us.cloud.teachme.auth_service.request.SignInRequest;
 import us.cloud.teachme.auth_service.service.JwtService;
 import us.cloud.teachme.auth_service.service.UserService;
 
@@ -40,7 +40,8 @@ public class AuthController {
   @Operation(summary = "Sign in", description = "Sign in to teachme platform")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "Sign in successful"),
-      @ApiResponse(responseCode = "400", description = "Invalid username or password")
+      @ApiResponse(responseCode = "400", description = "Invalid username or password"),
+      @ApiResponse(responseCode = "404", description = "User not found")
   })
   public ResponseEntity<?> signin(@RequestBody SignInRequest signInRequest) {
     User user = userService.findUserByEmail(signInRequest.email());

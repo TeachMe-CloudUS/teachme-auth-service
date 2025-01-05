@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import us.cloud.teachme.auth_service.exceptions.InvalidCredentialsException;
 import us.cloud.teachme.auth_service.exceptions.UserAlreadyExistsException;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
 import us.cloud.teachme.auth_service.model.ActivationCode;
@@ -16,6 +17,7 @@ import us.cloud.teachme.auth_service.model.KafkaTopics;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.ActivationCodeRepository;
 import us.cloud.teachme.auth_service.repository.UserRepository;
+import us.cloud.teachme.auth_service.request.UpdateUserRequestDto;
 
 @Service
 @RequiredArgsConstructor
@@ -65,6 +67,17 @@ public class UserService {
     if (kafkaTemplate != null)
       kafkaTemplate.send(KafkaTopics.USER_CREATED.getTopic(), savedUser);
     return savedUser;
+  }
+
+  public User updateUser(String userId, UpdateUserRequestDto updateUserRequestDto) {
+    User user = findUserById(userId);
+    if (!passwordEncoder.matches(updateUserRequestDto.oldPassword(), user.getPassword()))
+      throw new InvalidCredentialsException();
+    user.setPassword(passwordEncoder.encode(updateUserRequestDto.newPassword()));
+    User updatedUser = userRepository.save(user);
+    if (kafkaTemplate != null)
+      kafkaTemplate.send(KafkaTopics.USER_UPDATED.getTopic(), updatedUser);
+    return updatedUser;
   }
 
   public void deleteUser(String id) {

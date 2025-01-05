@@ -19,21 +19,21 @@ public class SecurityConfig {
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     return http
-      .cors(cors -> cors.disable())
-      .csrf(csrf -> csrf.disable())
-      .authorizeHttpRequests(authorize -> authorize
-        .requestMatchers("/api/v1/auth/**").permitAll()
-        .requestMatchers("/api/v1/auth/validate").authenticated()
-        .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
-        .requestMatchers("/api/v1/auth/activate").permitAll()
-        .requestMatchers("/api/v1/users/**").authenticated()
-        .requestMatchers("/swagger/**").permitAll()
-        .requestMatchers("/api/health").permitAll()
-        .anyRequest().denyAll()
-      )
-      .sessionManagement(session -> session.disable())
-      .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-      .build();
+        .cors(cors -> cors.disable())
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(authorize -> authorize
+            .requestMatchers("/api/v1/auth/**").permitAll()
+            .requestMatchers("/api/v1/auth/validate").authenticated()
+            .requestMatchers(HttpMethod.POST, "/api/v1/users").permitAll()
+            .requestMatchers("/api/v1/auth/activate").permitAll()
+            .requestMatchers("/api/v1/users/**").authenticated()
+            .requestMatchers("/swagger-ui/**").permitAll()
+            .requestMatchers("/swagger/**").permitAll()
+            .requestMatchers("/api/health").permitAll()
+            .anyRequest().denyAll())
+        .sessionManagement(session -> session.disable())
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+        .build();
   }
 
 }

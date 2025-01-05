@@ -22,10 +22,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
-import us.cloud.teachme.auth_service.model.RegisterRequest;
-import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
+import us.cloud.teachme.auth_service.request.RegisterRequest;
+import us.cloud.teachme.auth_service.request.SignInRequest;
 import us.cloud.teachme.auth_service.service.JwtService;
 import us.cloud.teachme.auth_service.service.MailService;
 import us.cloud.teachme.auth_service.service.UserService;
@@ -85,7 +85,7 @@ public class AuthControllerTest {
     mockMvc.perform(post("/api/v1/auth/signin")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isNotFound());
 
   }
 

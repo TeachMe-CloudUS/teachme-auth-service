@@ -15,7 +15,5 @@ sendgrid:
   from: ${SENDGRID_FROM:noreply@teachme.com}
 
 springdoc:
-  swagger-ui:
-    path: /swagger/auth-service/index.html
   api-docs:
     path: /swagger/auth-service/api-docs
