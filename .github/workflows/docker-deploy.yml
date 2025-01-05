@@ -42,7 +42,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          tags: ${{ github.ref_name }}, ${{ github.sha }}
+          tags: |
+            type=ref,event=branch
 
       - name: Set up maven settings
         uses: s4u/maven-settings-action@v3.1.0
