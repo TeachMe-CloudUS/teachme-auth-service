@@ -108,13 +108,6 @@
 
 	</dependencies>
 
-	<repositories>
-    <repository>
-        <id>github</id>
-        <url>https://maven.pkg.github.com/TeachMe-CloudUS/teachme-kafka-config</url>
-    </repository>
-	</repositories>
-
 	<build>
 		<plugins>
 			<plugin>
