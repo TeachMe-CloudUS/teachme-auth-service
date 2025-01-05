@@ -8,16 +8,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Map;
 
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,17 +22,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.impl.DefaultClaims;
 import us.cloud.teachme.auth_service.exceptions.UserNotFoundException;
-import us.cloud.teachme.auth_service.model.RegisterRequest;
-import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.repository.UserRepository;
+import us.cloud.teachme.auth_service.request.RegisterRequest;
+import us.cloud.teachme.auth_service.request.SignInRequest;
 import us.cloud.teachme.auth_service.service.JwtService;
 import us.cloud.teachme.auth_service.service.MailService;
 import us.cloud.teachme.auth_service.service.UserService;
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@ActiveProfiles("test")
 public class AuthControllerTest {
 
   @MockBean
@@ -52,12 +48,6 @@ public class AuthControllerTest {
 
   @MockBean
   private MailService mailService;
-
-  @MockBean
-  private KafkaTemplate<String, Object> kafkaTemplate;
-
-  @MockBean
-  private KafkaConsumer<String, Object> kafkaConsumer;
 
   @Autowired
   private MockMvc mockMvc;
@@ -95,7 +85,7 @@ public class AuthControllerTest {
     mockMvc.perform(post("/api/v1/auth/signin")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isNotFound());
 
   }
 

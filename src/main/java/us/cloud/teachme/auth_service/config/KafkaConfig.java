@@ -1,42 +1,74 @@
 package us.cloud.teachme.auth_service.config;
 
+import java.util.Map;
+
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Profile;
+import org.springframework.kafka.config.TopicBuilder;
+import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.core.ProducerFactory;
 
 import us.cloud.teachme.auth_service.model.KafkaTopics;
-import us.cloud.teachme.kafkaconfig.service.KafkaUtils;
 
 @Configuration
-@Profile("!test")
-@Import(us.cloud.teachme.kafkaconfig.config.KafkaConfig.class)
+@ConditionalOnProperty(value = "spring.kafka.enabled", havingValue = "true")
 public class KafkaConfig {
+
+  @Value("${spring.kafka.bootstrap-servers}")
+  private String bootstrapServers;
 
   @Bean
   NewTopic userCreatedTopic() {
-    return KafkaUtils.createTopic(KafkaTopics.USER_CREATED.getTopic());
+    return TopicBuilder.name(KafkaTopics.USER_CREATED.getTopic())
+        .build();
   }
 
   @Bean
   NewTopic userUpdatedTopic() {
-    return KafkaUtils.createTopic(KafkaTopics.USER_UPDATED.getTopic());
+    return TopicBuilder.name(KafkaTopics.USER_UPDATED.getTopic())
+        .build();
   }
 
   @Bean
   NewTopic userDeletedTopic() {
-    return KafkaUtils.createTopic(KafkaTopics.USER_DELETED.getTopic());
+    return TopicBuilder.name(KafkaTopics.USER_DELETED.getTopic())
+        .build();
   }
 
   @Bean
   NewTopic userActivatedTopic() {
-    return KafkaUtils.createTopic(KafkaTopics.USER_ACTIVATED.getTopic());
+    return TopicBuilder.name(KafkaTopics.USER_ACTIVATED.getTopic())
+        .build();
   }
 
   @Bean
   NewTopic mailSendTopic() {
-    return KafkaUtils.createTopic(KafkaTopics.MAIL_SEND.getTopic());
+    return TopicBuilder.name(KafkaTopics.MAIL_SEND.getTopic())
+        .build();
+  }
+
+  @Bean
+  Map<String, Object> producerProps() {
+    return Map.of(
+        ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers,
+        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
+        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+  }
+
+  @Bean
+  ProducerFactory<String, Object> producerFactory() {
+    return new DefaultKafkaProducerFactory<>(producerProps());
+  }
+
+  @Bean
+  KafkaTemplate<String, Object> kafkaTemplate() {
+    return new KafkaTemplate<>(producerFactory());
   }
 
 }

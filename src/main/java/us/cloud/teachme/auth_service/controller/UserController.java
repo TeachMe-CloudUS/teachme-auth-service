@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +24,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
-import us.cloud.teachme.auth_service.model.SignInRequest;
 import us.cloud.teachme.auth_service.model.User;
 import us.cloud.teachme.auth_service.model.UserValidator;
+import us.cloud.teachme.auth_service.request.SignInRequest;
+import us.cloud.teachme.auth_service.request.UpdateUserRequestDto;
 import us.cloud.teachme.auth_service.service.UserService;
 
 @RestController
@@ -67,7 +69,7 @@ public class UserController {
   @Operation(summary = "Create user", description = "Create user in teachme platform")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "User created"),
-      @ApiResponse(responseCode = "400", description = "Invalid user")
+      @ApiResponse(responseCode = "409", description = "User already exists")
   })
   public ResponseEntity<?> createUser(@Validated @RequestBody SignInRequest signInRequest) {
     User user = User.builder().email(signInRequest.email()).password(signInRequest.password()).build();
@@ -76,6 +78,22 @@ public class UserController {
       return ResponseEntity.badRequest().body(errors.getAllErrors());
     }
     return ResponseEntity.ok(Map.of("userId", userService.createUser(user).getId()));
+  }
+
+  @PutMapping("/{userId}")
+  @Operation(summary = "Update user", description = "Update user password in teachme platform", security = {
+      @SecurityRequirement(name = "bearer-key") })
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "User updated"),
+      @ApiResponse(responseCode = "404", description = "User not found"),
+      @ApiResponse(responseCode = "401", description = "Unauthorized")
+  })
+  public ResponseEntity<User> updateUser(@PathVariable String userId,
+      @RequestBody UpdateUserRequestDto updateUserRequestDto,
+      @AuthenticationPrincipal User authUser) {
+    if (authUser == null || (!authUser.getRole().equals("ADMIN") && !authUser.getId().equals(userId)))
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    return ResponseEntity.ok(userService.updateUser(userId, updateUserRequestDto));
   }
 
   @DeleteMapping("/{userId}")

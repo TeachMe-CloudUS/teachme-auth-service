@@ -102,19 +102,11 @@
 		</dependency>
 
 		<dependency>
-				<groupId>us.cloud.teachme</groupId>
-				<artifactId>kafka-config</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+			<groupId>org.springframework.kafka</groupId>
+			<artifactId>spring-kafka</artifactId>
 		</dependency>
 
 	</dependencies>
-
-	<repositories>
-    <repository>
-        <id>github</id>
-        <url>https://maven.pkg.github.com/TeachMe-CloudUS/teachme-kafka-config</url>
-    </repository>
-	</repositories>
 
 	<build>
 		<plugins>

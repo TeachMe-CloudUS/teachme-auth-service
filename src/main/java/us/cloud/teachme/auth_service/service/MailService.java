@@ -3,6 +3,7 @@ package us.cloud.teachme.auth_service.service;
 import java.io.IOException;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,8 @@ public class MailService {
   @Value("${base-url}")
   private String BASE_URL;
 
-  private final KafkaTemplate<String, Object> kafkaTemplate;
+  @Autowired(required = false)
+  private KafkaTemplate<String, Object> kafkaTemplate;
 
   public void sendActivationMail(String userId, ActivationCode code) {
     Email from = new Email(SENDGRID_FROM);
@@ -51,21 +53,23 @@ public class MailService {
       Response response = sg.api(request);
       if (response.getStatusCode() != 202) {
         System.out.println("Error sending email: " + response.getBody());
+        if (kafkaTemplate != null)
+          kafkaTemplate.send(KafkaTopics.MAIL_SEND.getTopic(), Map.of(
+              "usedId", userId,
+              "email", code.getEmail(),
+              "code", code.getId(),
+              "status", response.getStatusCode(),
+              "message", response.getBody()));
+      }
+    } catch (IOException ex) {
+      System.out.println(ex.getMessage());
+      if (kafkaTemplate != null)
         kafkaTemplate.send(KafkaTopics.MAIL_SEND.getTopic(), Map.of(
             "usedId", userId,
             "email", code.getEmail(),
             "code", code.getId(),
-            "status", response.getStatusCode(),
-            "message", response.getBody()));
-      }
-    } catch (IOException ex) {
-      System.out.println(ex.getMessage());
-      kafkaTemplate.send(KafkaTopics.MAIL_SEND.getTopic(), Map.of(
-          "usedId", userId,
-          "email", code.getEmail(),
-          "code", code.getId(),
-          "status", "undefined",
-          "message", ex.getMessage()));
+            "status", "undefined",
+            "message", ex.getMessage()));
     }
   }
 
