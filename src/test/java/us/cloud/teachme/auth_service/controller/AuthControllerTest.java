@@ -85,7 +85,7 @@ public class AuthControllerTest {
     mockMvc.perform(post("/api/v1/auth/signin")
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(signInRequest)))
-        .andExpect(status().isBadRequest());
+        .andExpect(status().isNotFound());
 
   }
 
