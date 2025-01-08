@@ -2,7 +2,9 @@ name: Create and publish the Docker image to GitHub Container Registry
 
 on:
   push:
-    branches: ["master"]
+    branches:
+      - master
+      - develop
     tags: ["v*.*.*"]
   pull_request:
     branches: ["master"]
@@ -40,8 +42,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          flavor: |
-            latest=true
+          tags: |
+            type=ref,event=branch
 
       - name: Set up maven settings
         uses: s4u/maven-settings-action@v3.1.0
