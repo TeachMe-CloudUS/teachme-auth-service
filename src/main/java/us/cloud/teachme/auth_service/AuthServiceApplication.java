@@ -39,7 +39,7 @@ public class AuthServiceApplication {
 		return args -> {
 			List<User> users = userRepository.findByEmail("admin@teachme.com");
 			if (users.isEmpty()) {
-				User user = User.builder().email("admin@gmail.com").password(passwordEncoder.encode("123456")).role("ADMIN")
+				User user = User.builder().email("admin@teachme.com").password(passwordEncoder.encode("123456")).role("ADMIN")
 						.enabled(true).build();
 				userRepository.save(user);
 			} else {
